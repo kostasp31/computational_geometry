@@ -6,7 +6,7 @@ def main():
     print("Computational Geometry")
     # random.seed(5733839)
     point_list = []
-    for i in range(0,1000):   # 10 random real numbers
+    for i in range(0,10):   # 10 random real numbers
         point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
     
     # for i in range(0,10):   # 10 random real numbers
