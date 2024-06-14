@@ -4,13 +4,13 @@ import random
 
 def main():
     print("Computational Geometry")
-    # random.seed(57233839)
+    # random.seed(5733839)
     point_list = []
-    # for i in range(0,20):   # 10 random real numbers
-    #     point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
+    for i in range(0,1000):   # 10 random real numbers
+        point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
     
-    for i in range(0,20):   # 10 random real numbers
-        point_list.append(np.array([random.randint(1,50), random.randint(1,50)]))
+    # for i in range(0,10):   # 10 random real numbers
+    #     point_list.append(np.array([random.randint(1,50), random.randint(1,50)]))
 
     # print(point_list)
     L = incremental(point_list)
@@ -31,6 +31,14 @@ def main():
 
     plt.plot(x1,y1,'o', color='red')
     plt.plot(x2,y2,'o', color='blue')
+    for i in range(0, len(x2), 2):
+        plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
+    for i in range(1, len(x2), 2):
+        plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
+
+    x = np.array([x2[0], x2[-1]])
+    y = np.array([y2[0], y2[-1]])
+    plt.plot(x, y, 'blue')
     plt.show()
 
 
@@ -66,15 +74,15 @@ def incremental(points):
     L_upper.append(points[1])
     for i in range(2, len(points)): # 3 to n
         L_upper.append(points[i])
-        while (len(L_upper) > 2) and (CCW(L_upper[-1], L_upper[-2], L_upper[-3]) >= 0):
+        while (len(L_upper) > 2) and (CCW(L_upper[-3], L_upper[-2], L_upper[-1]) >= 0):
             del L_upper[-2]
     
     L_lower = []
     L_lower.append(points[-1])   # insert p_n
     L_lower.append(points[-2])   # insert p_n-1
-    for i in range(len(points)-2, 0, -1): # n-2 to 1
+    for i in range(len(points)-3, -1, -1): # n-2 to 1
         L_lower.append(points[i])
-        while (len(L_lower) > 2) and (CCW(L_lower[-1], L_lower[-2], L_lower[-3]) >= 0):
+        while (len(L_lower) > 2) and (CCW(L_lower[-3], L_lower[-2], L_lower[-1]) >= 0):
             del L_lower[-2]
 
     del L_lower[0]  # remove first and last element
