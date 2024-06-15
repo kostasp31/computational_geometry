@@ -1,45 +1,48 @@
 import scipy
 import numpy as np
 import random
+import math
 
 def main():
     print("Computational Geometry")
     # random.seed(5733839)
+    # for j in range(10,50):
     point_list = []
-    for i in range(0,10):   # 10 random real numbers
-        point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
-    
     # for i in range(0,10):   # 10 random real numbers
-    #     point_list.append(np.array([random.randint(1,50), random.randint(1,50)]))
+    #     point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
+    
+    for i in range(0,10):   # 10 random real numbers
+        point_list.append(np.array([random.randint(1,10), random.randint(1,10)]))
 
+    gift_wrapping(point_list)
     # print(point_list)
-    L = incremental(point_list)
-    print(L)
+    # L = incremental(point_list)
+    # print(L)
 
-    import matplotlib.pyplot as plt 
-    x1 = []
-    y1 = []
-    for itm in point_list:
-        x1.append(itm[0])
-        y1.append(itm[1])
+    # import matplotlib.pyplot as plt 
+    # x1 = []
+    # y1 = []
+    # for itm in point_list:
+    #     x1.append(itm[0])
+    #     y1.append(itm[1])
 
-    x2 = []
-    y2 = []
-    for itm in L:
-        x2.append(itm[0])
-        y2.append(itm[1])
+    # x2 = []
+    # y2 = []
+    # for itm in L:
+    #     x2.append(itm[0])
+    #     y2.append(itm[1])
 
-    plt.plot(x1,y1,'o', color='red')
-    plt.plot(x2,y2,'o', color='blue')
-    for i in range(0, len(x2), 2):
-        plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
-    for i in range(1, len(x2), 2):
-        plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
+    # plt.plot(x1,y1,'o', color='red')
+    # plt.plot(x2,y2,'o', color='blue')
+    # for i in range(0, len(x2), 2):
+    #     plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
+    # for i in range(1, len(x2), 2):
+    #     plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
 
-    x = np.array([x2[0], x2[-1]])
-    y = np.array([y2[0], y2[-1]])
-    plt.plot(x, y, 'blue')
-    plt.show()
+    # x = np.array([x2[0], x2[-1]])
+    # y = np.array([y2[0], y2[-1]])
+    # plt.plot(x, y, 'blue')
+    # plt.show()
 
 
 
@@ -53,7 +56,6 @@ def CCW(p0, p1, p2):
     mat[1][2] = p1[1]
     mat[2][1] = p2[0]
     mat[2][2] = p2[1]
-
     det_ = np.linalg.det(mat)
     if (det_ > 0):
         return 1
@@ -90,7 +92,36 @@ def incremental(points):
     L = L_upper+L_lower
     return L
         
-    
+def dist(a, b):
+    d = math.sqrt((a[1] - b[1])**2 + (a[2] - b[2]))
+    return d
+
+def minKey(point):
+    x = point[0]
+    y = point[1]
+    return (x,y)
+
+def gift_wrapping(S):
+    chain = []
+    known = S
+    r = min(S, key=minKey)    # point with min x, if many, the one with min y
+    chain.append(r)
+
+    while (1):
+        tempL = [item for item in S if item not in chain] # choose a random point that has not been selected yet
+        u = tempL[0]
+        for t in S:
+            if np.array_equal(t, u):
+                continue
+            if CCW(r, u, t) or (CCW(r,u,t) == 0 and dist(r,u) < dist(r,t) and dist(t,u) < dist(t,r)):
+                u = t
+        if u == chain[0]:   # u == r0
+            return chain
+        else:
+            r = u
+            S = S.remove(r)
+            chain.append(r)
+        
 
 
 
