@@ -16,25 +16,26 @@ def complists(l1, l2):
 def main():
     print("Computational Geometry")
     # random.seed(5733839)
-    # for j in range(10,1000):
+    # for j in range(1,1000):
     point_list = []
-    for i in range(0,10):   # 10 random real numbers
-        point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
+    # for i in range(0,10):   # 10 random real numbers
+    #     point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
     
-    # for i in range(0,20):   # 10 random real numbers
-    #     point_list.append(np.array([random.randint(1,10), random.randint(1,10)]))
+    for i in range(0,10):   # 10 random real numbers
+        point_list.append(np.array([random.randint(1,500), random.randint(1,500)]))
 
-    print("GIFT WRAPPING")
-    LG = gift_wrapping(point_list.copy())
-    print(LG)
+    # print("GIFT WRAPPING")
+    # LG = gift_wrapping(point_list.copy())
+    # print(LG)
 
-    print("INCREMENTAL")
-    L = incremental(point_list.copy())
-    print(L)
+    # print("INCREMENTAL")
+    # L = incremental(point_list.copy())
+    # print(L)
 
-    if not complists(L, LG):
-        printHull(L, point_list.copy())
-        printHull(LG, point_list.copy())
+    # if not complists(L, LG):
+    #     printHull(L, point_list.copy())
+    #     printHull(LG, point_list.copy())
+    divide_and_conquer(point_list.copy())
 
 
 def printHull(L, point_list):
@@ -52,7 +53,7 @@ def printHull(L, point_list):
         y2.append(itm[1])
 
     plt.plot(x1,y1,'o', color='red')
-    plt.plot(x2,y2,'o', color='blue')
+    plt.plot(x2,y2,'o', color='red')
     for i in range(0, len(x2), 2):
         plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
     for i in range(1, len(x2), 2):
@@ -155,10 +156,24 @@ def gift_wrapping(S):
             # remVec(r, S) # S <- S\{r}
             chain.append(r)
         
+def merge(A, B):
+    Ai = A[-1]
+    Bi = B[0]
+    
+    
 
-
-
-
+def divide_and_conquer(points):
+    if len(points) == 1:
+        return points   
+    
+    points.sort(key=getX)  # sort points in ascending order
+    A = points[:math.ceil(len(points)/2)]
+    B = points[(math.ceil(len(points)/2)):]
+    divide_and_conquer(A)
+    divide_and_conquer(B)
+    # print(A)
+    # print(B)
+    return merge(A, B)
 
 
 
