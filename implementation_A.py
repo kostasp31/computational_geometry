@@ -19,7 +19,7 @@ def main():
     # random.seed(j)
     # print('SEED', j)
     point_list = []
-    for i in range(0,1000):   # 10 random real numbers
+    for i in range(0,10):   # 10 random real numbers
         point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
     
     # li = random.sample(range(0,40), 24)
@@ -42,18 +42,20 @@ def main():
     # LG = gift_wrapping(point_list.copy())
     # print('LG',LG)
     # print('\n')
+    quick_hull(point_list.copy())
+
 
     print("INCREMENTAL")
     L = incremental(point_list.copy())
-    print(L)
+    # print(L)
 
-    print("DIVIDE AND CONQUER")
-    LD = divide_and_conquer(point_list.copy())
-    print(LD)
+    # print("DIVIDE AND CONQUER")
+    # LD = divide_and_conquer(point_list.copy())
+    # print(LD)
 
     # if not complists(L, LD):
     printHull(L, point_list.copy())
-    printHull(LD, point_list.copy())
+    # printHull(LD, point_list.copy())
 
 def printHull(L, point_list):
     import matplotlib.pyplot as plt 
@@ -148,7 +150,6 @@ def remVec(v, li):
             del li[i]
             break
 
-
 def gift_wrapping(S):
     chain = []
     r = min(S, key=minKey)    # point with min x, if many, the one with min y
@@ -201,7 +202,6 @@ def getIndexOfRightmost(H):
             rightMost = i
     return rightMost
         
-
 def merge(A, B):
     # print('Merging:', A, B)
     finalHull = []
@@ -303,12 +303,6 @@ def merge(A, B):
     # print(finalHull)
     return finalHull
 
-
-
-
-    
-    
-
 def divide_and_conquer(points):
     if len(points) <= 2:
         return (points)   
@@ -318,16 +312,39 @@ def divide_and_conquer(points):
     B = points[(math.ceil(len(points)/2)):]
     CHA = divide_and_conquer(A)
     CHB = divide_and_conquer(B)
-    # print(A)
-    # print(B)
     m = merge(CHA, CHB)
     return m
+
+def quick_hull(points):
+    top = 0
+    bottom = 0
+    right = 0
+    left = 0
+    for i in range(0, len(points)):
+        if points[i][1] > points[top][1]:
+            top = i
+        if points[i][1] < points[bottom][1]:
+            bottom = i
+        if points[i][0] > points[right][0]:
+            right = i
+        if points[i][0] < points[left][0]:
+            left = i
+
+    print('top', points[top])
+    print('bottom', points[bottom])
+    print('right', points[right])
+    print('left', points[left])
+        
+
+
+
+
+
+
+
+
 
 
 
 if __name__ == "__main__":
     main()
-
-
-'''(CCW(A[i], A[getNext(i, A)], A[getDiffPoint(A, A[i], A[getNext(i, A)])]) >= 0) and'''
-'''(CCW(B[j], B[getPrev(j, B)], B[getDiffPoint(B, B[j], B[getPrev(j, B)])]) <= 0) and'''
