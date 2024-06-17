@@ -2,6 +2,7 @@ import scipy
 import numpy as np
 import random
 import math
+import numpy.linalg
 
 def complists(l1, l2):
     ll = len(l1)
@@ -15,47 +16,42 @@ def complists(l1, l2):
 
 def main():
     print("Computational Geometry")
-    # for j in range(2,1000):
-    # random.seed(j)
-    # print('SEED', j)
-    point_list = []
-    for i in range(0,10):   # 10 random real numbers
-        point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
-    
-    # li = random.sample(range(0,40), 24)
-    # for i in range(0,10):   # 10 random real numbers
-    #     point_list.append(np.array([li[i], li[i+1]]))
+    for j in range(10,1000):
+        random.seed(j)
+        print('SEED', j)
+        while (1):
+            point_list = []
+            for i in range(0,j):   # 10 random real numbers
+                point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
+            
+            # li = random.sample(range(0,40), 24)
+            # for i in range(0,10):   # 10 random real numbers
+            #     point_list.append(np.array([li[i], li[i+1]]))
 
-    # print('points1', point_list.copy()[0:5])
-    # print('points2', point_list.copy()[5:10])
+            # print("GIFT WRAPPING")
+            # LG = gift_wrapping(point_list.copy())
+            # print('LG',LG)
+            # print('\n')
 
-    # import matplotlib.pyplot as plt 
-    # x1 = []
-    # y1 = []
-    # for itm in point_list:
-    #     x1.append(itm[0])
-    #     y1.append(itm[1])
-    # plt.plot(x1,y1,'o', color='red')
-    # plt.show()
+            h = quick_hull(point_list.copy())
+            if h == None:
+                continue
+            else:
+                break
 
-    # print("GIFT WRAPPING")
-    # LG = gift_wrapping(point_list.copy())
-    # print('LG',LG)
-    # print('\n')
-    quick_hull(point_list.copy())
+        print("INCREMENTAL")
+        L = incremental(point_list.copy())
+        print(L)
+        print("QUICKHULL")
+        print(h)
 
+        # print("DIVIDE AND CONQUER")
+        # LD = divide_and_conquer(point_list.copy())
+        # print(LD)
 
-    print("INCREMENTAL")
-    L = incremental(point_list.copy())
-    # print(L)
-
-    # print("DIVIDE AND CONQUER")
-    # LD = divide_and_conquer(point_list.copy())
-    # print(LD)
-
-    # if not complists(L, LD):
-    printHull(L, point_list.copy())
-    # printHull(LD, point_list.copy())
+        if not complists(L, h):
+            printHull(L, point_list.copy())
+            printHull(h, point_list.copy())
 
 def printHull(L, point_list):
     import matplotlib.pyplot as plt 
@@ -315,6 +311,10 @@ def divide_and_conquer(points):
     m = merge(CHA, CHB)
     return m
 
+# distance of c from line that a,b define
+def distFromLine(a, b, c):
+    return np.linalg.norm(np.cross(b-a, a-c))/np.linalg.norm(b-a)
+
 def quick_hull(points):
     top = 0
     bottom = 0
@@ -330,10 +330,82 @@ def quick_hull(points):
         if points[i][0] < points[left][0]:
             left = i
 
-    print('top', points[top])
-    print('bottom', points[bottom])
-    print('right', points[right])
-    print('left', points[left])
+    hull = []
+    hull.append(top)
+    hull.append(right)
+    hull.append(bottom)
+    hull.append(left)
+    if len(set(hull)) != 4:
+        print('We should assume that the 4 extreme points are different')
+        print(top)
+        print(right)
+        print(bottom)
+        print(left)
+        return None
+    
+    h = hull_rec(points[top], points[right], points)+hull_rec(points[right], points[bottom], points)+hull_rec(points[bottom], points[left], points)+hull_rec(points[left], points[top], points)
+    
+    first = h[0]
+    stopAt = len(h)-1
+    for i in range(1, len(h)):
+        if np.array_equal(h[i], first):
+            stopAt = i
+            break
+    h = h[0:stopAt]
+    # 'reset' index to start from the leftmost point
+    h0 = h.copy()
+    h0.sort(key=getX)
+    shiftBY = 0
+    i = 0
+    for el in h:
+        if np.array_equal(el, h0[0]):
+            shiftBY = i
+        i += 1
+
+    h = [h[(i + shiftBY) % len(h)] for i, x in enumerate(h)]
+
+    i = 0
+    while i < len(h)-1:
+        if np.array_equal(h[i], h[i+1]):
+            del h[i]
+        else:
+            i+=1
+
+    return h
+
+def hull_rec(A, B, S):
+    hull = []
+    if len(S) == 2 and ((np.array_equal(A, S[0]) and np.array_equal(B, S[1])) or (np.array_equal(A, S[1]) and np.array_equal(B, S[0]))):
+        hull.append(A)
+        hull.append(B)
+        return hull
+    else:
+        maxDist = float('-inf')
+        C = np.array([float('-inf'), float('-inf')])
+        noneType = C
+        for p in S:
+            if np.array_equal(A, p) or np.array_equal(B, p):
+                continue
+            d = distFromLine(A, B, p)
+            if d > maxDist:
+                maxDist = d
+                C = p
+        if np.array_equal(C, noneType):
+            hull.append(A)
+            hull.append(B)
+            return hull            
+        M = []
+        N = []
+        M.append(A)
+        N.append(C)
+        for p in S:
+            if CCW(A, C, p) > 0:
+                M.append(p)
+            elif CCW(C, B, p) > 0:
+                N.append(p)
+        M.append(C)
+        N.append(B)
+        return hull_rec(A, C, M)[:-1] + hull_rec(C, B, N)
         
 
 
