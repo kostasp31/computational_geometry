@@ -15,28 +15,45 @@ def complists(l1, l2):
 
 def main():
     print("Computational Geometry")
-    # random.seed(5733839)
-    # for j in range(1,1000):
+    # for j in range(2,1000):
+    # random.seed(j)
+    # print('SEED', j)
     point_list = []
-    # for i in range(0,10):   # 10 random real numbers
-    #     point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
+    for i in range(0,1000):   # 10 random real numbers
+        point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
     
-    for i in range(0,10):   # 10 random real numbers
-        point_list.append(np.array([random.randint(1,500), random.randint(1,500)]))
+    # li = random.sample(range(0,40), 24)
+    # for i in range(0,10):   # 10 random real numbers
+    #     point_list.append(np.array([li[i], li[i+1]]))
+
+    # print('points1', point_list.copy()[0:5])
+    # print('points2', point_list.copy()[5:10])
+
+    # import matplotlib.pyplot as plt 
+    # x1 = []
+    # y1 = []
+    # for itm in point_list:
+    #     x1.append(itm[0])
+    #     y1.append(itm[1])
+    # plt.plot(x1,y1,'o', color='red')
+    # plt.show()
 
     # print("GIFT WRAPPING")
     # LG = gift_wrapping(point_list.copy())
-    # print(LG)
+    # print('LG',LG)
+    # print('\n')
 
-    # print("INCREMENTAL")
-    # L = incremental(point_list.copy())
-    # print(L)
+    print("INCREMENTAL")
+    L = incremental(point_list.copy())
+    print(L)
 
-    # if not complists(L, LG):
-    #     printHull(L, point_list.copy())
-    #     printHull(LG, point_list.copy())
-    divide_and_conquer(point_list.copy())
+    print("DIVIDE AND CONQUER")
+    LD = divide_and_conquer(point_list.copy())
+    print(LD)
 
+    # if not complists(L, LD):
+    printHull(L, point_list.copy())
+    printHull(LD, point_list.copy())
 
 def printHull(L, point_list):
     import matplotlib.pyplot as plt 
@@ -155,27 +172,162 @@ def gift_wrapping(S):
             r = u
             # remVec(r, S) # S <- S\{r}
             chain.append(r)
+
+def getNext(i, points):
+    l = len(points)
+    if i+1 >= l:
+        return 0
+    else:
+        return i+1
+
+def getPrev(i, points):
+    l = len(points)
+    if i-1 < 0:
+        return l-1
+    else:
+        return i-1
+    
+def getDiffPoint(points, p1, p2):
+    for p in range(0, len(points)):
+        if np.array_equal(points[p], p1) or np.array_equal(points[p], p2):
+            continue
+        else:
+            return p
+
+def getIndexOfRightmost(H):
+    rightMost = 0
+    for i in range(0, len(H)):
+        if H[i][0] > H[rightMost][0]:
+            rightMost = i
+    return rightMost
         
+
 def merge(A, B):
-    Ai = A[-1]
-    Bi = B[0]
+    # print('Merging:', A, B)
+    finalHull = []
+    # if len(A) == 1 or len(B) == 1:
+        # print('a')
+    
+    i = getIndexOfRightmost(A)
+    j = 0
+    upper = []
+    lower = []
+    while (1):  # upper tangent
+        changed = False
+        # print(i, getNext(i,A), getDiffPoint(A, A[i], A[getNext(i, A)]))
+        # print(j, getPrev(j,B), getDiffPoint(B, B[j], B[getPrev(j, B)]))
+        init_i = i
+        init_j = j
+        # if getNext(i, A) != 0:
+        while  (CCW(A[i], A[getPrev(i, A)], B[j]) < 0):
+            i = getPrev(i, A)
+            changed = True
+        # if getPrev(j, B) != len(B)-1:
+        while (CCW(B[j], B[getNext(j, B)], A[i]) > 0):
+            j = getNext(j, B)
+            changed = True
+        if i == init_i and j == init_j:
+            break
+    # print('Upper:', A[i], ',', B[j])
+    upper.append(A[i])
+    upper.append(B[j])
+
+    i = getIndexOfRightmost(A)
+    j = 0
+    while (1):  # lower tangent
+        changed = False
+        # print(i, getPrev(i,A), getDiffPoint(A, A[i], A[getPrev(i, A)]))
+        # print(j, getNext(j,B), getDiffPoint(B, B[j], B[getNext(j, B)]))
+        init_i = i
+        init_j = j
+        # if getPrev(i, A) != 0:
+        while  (CCW(A[i], A[getNext(i, A)], B[j]) > 0):
+            i = getNext(i, A)
+            changed = True
+        # if getNext(j, B) != len(B)-1:
+        while (CCW(B[j], B[getPrev(j, B)], A[i]) < 0):
+            j = getPrev(j, B)
+            changed = True
+        if i == init_i and j == init_j:
+            break
+    # print('Lower:', A[i], ',', B[j])
+    lower.append(A[i])
+    lower.append(B[j])
+
+    finalHull = []
+    i=0
+    while (1):
+        if not np.array_equal(A[i], upper[0]):
+            if not vecInList(A[i], finalHull):
+                finalHull.append(A[i])
+        else:
+            if not vecInList(upper[0], finalHull):
+                finalHull.append(upper[0])
+            if not vecInList(upper[1], finalHull):
+                finalHull.append(upper[1])
+            break
+        i = getNext(i, A)
+
+    start_from = 0
+    for j in range(0, len(B)):
+        if np.array_equal(B[j], upper[1]):
+            start_from = j#getNext(j, B)
+
+    j = start_from
+    while(1):
+        if not np.array_equal(B[j], lower[1]):
+            if not vecInList(B[j], finalHull):
+                finalHull.append(B[j])
+        else:
+            if not vecInList(lower[1], finalHull):
+                finalHull.append(lower[1])
+            if not vecInList(lower[0], finalHull):
+                finalHull.append(lower[0])
+            break
+        j = getNext(j, B)
+
+    cont_from = 0
+    for i in range(0, len(A)):
+        if np.array_equal(A[i], lower[0]):
+            cont_from = i#getNext(i, A)
+    
+    i = cont_from
+    while(1):
+        if np.array_equal(A[i], upper[0]):
+            break
+        else:
+            if not vecInList(A[i], finalHull):
+                finalHull.append(A[i])
+        i = getNext(i, A)
+
+    # print(finalHull)
+    return finalHull
+
+
+
+
     
     
 
 def divide_and_conquer(points):
-    if len(points) == 1:
-        return points   
+    if len(points) <= 2:
+        return (points)   
     
     points.sort(key=getX)  # sort points in ascending order
     A = points[:math.ceil(len(points)/2)]
     B = points[(math.ceil(len(points)/2)):]
-    divide_and_conquer(A)
-    divide_and_conquer(B)
+    CHA = divide_and_conquer(A)
+    CHB = divide_and_conquer(B)
     # print(A)
     # print(B)
-    return merge(A, B)
+    m = merge(CHA, CHB)
+    return m
 
 
 
 if __name__ == "__main__":
     main()
+
+
+'''(CCW(A[i], A[getNext(i, A)], A[getDiffPoint(A, A[i], A[getNext(i, A)])]) >= 0) and'''
+'''(CCW(B[j], B[getPrev(j, B)], B[getDiffPoint(B, B[j], B[getPrev(j, B)])]) <= 0) and'''
