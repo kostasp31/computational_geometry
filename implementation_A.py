@@ -16,42 +16,44 @@ def complists(l1, l2):
 
 def main():
     print("Computational Geometry")
-    for j in range(10,1000):
-        random.seed(j)
-        print('SEED', j)
-        while (1):
-            point_list = []
-            for i in range(0,j):   # 10 random real numbers
-                point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
-            
-            # li = random.sample(range(0,40), 24)
-            # for i in range(0,10):   # 10 random real numbers
-            #     point_list.append(np.array([li[i], li[i+1]]))
+    # for j in range(10,1000):
+    # random.seed(j)
+    # print('SEED', j)
+    # while (1):
+    point_list = []
+    for i in range(0,30):   # 10 random real numbers
+        point_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
+    
 
-            # print("GIFT WRAPPING")
-            # LG = gift_wrapping(point_list.copy())
-            # print('LG',LG)
-            # print('\n')
+    gift_wrapping_show_steps(point_list.copy())
+    # li = random.sample(range(0,40), 24)
+    # for i in range(0,10):   # 10 random real numbers
+    #     point_list.append(np.array([li[i], li[i+1]]))
 
-            h = quick_hull(point_list.copy())
-            if h == None:
-                continue
-            else:
-                break
+    # print("GIFT WRAPPING")
+    LG = gift_wrapping(point_list.copy())
+    print('LG',LG)
+    # print('\n')
 
-        print("INCREMENTAL")
-        L = incremental(point_list.copy())
-        print(L)
-        print("QUICKHULL")
-        print(h)
+    # h = quick_hull(point_list.copy())
+    # if h == None:
+    #     continue
+    # else:
+    #     break
 
-        # print("DIVIDE AND CONQUER")
-        # LD = divide_and_conquer(point_list.copy())
-        # print(LD)
+    # print("INCREMENTAL")
+    # L = incremental(point_list.copy())
+    # print(L)
+    # print("QUICKHULL")
+    # print(h)
 
-        if not complists(L, h):
-            printHull(L, point_list.copy())
-            printHull(h, point_list.copy())
+    # print("DIVIDE AND CONQUER")
+    # LD = divide_and_conquer(point_list.copy())
+    # print(LD)
+
+    # if not complists(L, h):
+    #     printHull(L, point_list.copy())
+    #     printHull(h, point_list.copy())
 
 def printHull(L, point_list):
     import matplotlib.pyplot as plt 
@@ -409,10 +411,53 @@ def hull_rec(A, B, S):
         
 
 
+def gift_wrapping_show_steps(S):
+    chain = []
+    r = min(S, key=minKey)    # point with min x, if many, the one with min y
+    chain.append(r)
 
+    import matplotlib.pyplot as plt
+    plt.axis([-100, 100, -100, 100])
+    for i in S:
+        plt.plot(i[0], i[1],'o', color='red')
+        plt.pause(0.1)
 
+    plt.plot(r[0], r[1],'o', color='blue')
+    plt.pause(0.1)
+    while (1):
+        tempL = []
+        tempL = [item for item in S if not vecInList(item, chain)] # choose a random point that has not been selected yet
+        if tempL == []:
+            plt.plot([chain[0][0], chain[-1][0]] , [chain[0][1], chain[-1][1]], 'blue')
+            plt.pause(0.1)
+            break
+        u = tempL[0]
+        outln, = plt.plot([r[0], u[0]] , [r[1], u[1]], 'blue')
+        plt.pause(0.1)
+        for t in S: # t in S 
+            if np.array_equal(t, u):   #S\{u}
+                continue
+            ln, = plt.plot([r[0], t[0]], [r[1], t[1]], color='green')
+            plt.pause(0.1)
+            if CCW(r, u, t) > 0 or (CCW(r,u,t) == 0 and dist(r,u) < dist(r,t) and dist(t,u) < dist(t,r)):
+                u = t
+                outln.remove()
+                outln, = plt.plot([r[0], t[0]] , [r[1], t[1]], 'blue')
+            ln.remove()
+        if np.array_equal(u, chain[0]):   # u == r0
+            plt.plot([chain[0][0], chain[-1][0]] , [chain[0][1], chain[-1][1]], 'blue')
+            plt.pause(0.1)
+            break
+        else:
+            r = u
+            # remVec(r, S) # S <- S\{r}
+            chain.append(r)
+            plt.plot(r[0], r[1],'o', color='blue')
+            plt.pause(0.1)
 
-
+    plt.show()
+    print(chain)
+    return chain
 
 
 
