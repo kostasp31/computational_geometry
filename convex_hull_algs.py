@@ -265,34 +265,34 @@ def hull_rec(A, B, S):
         
 
 
-def gift_wrapping_show_steps(S):
+def gift_wrapping_show_steps(S, delay=0.05):
     chain = []
     r = min(S, key=minKey)    # point with min x, if many, the one with min y
     chain.append(r)
 
     import matplotlib.pyplot as plt
-    plt.axis([-100, 100, -100, 100])
+    plt.axis([-110, 110, -110, 110])
     for i in S:
         plt.plot(i[0], i[1],'o', color='red')
-        plt.pause(0.1)
+        plt.pause(delay)
 
     plt.plot(r[0], r[1],'o', color='blue')
-    plt.pause(0.1)
+    plt.pause(delay)
     while (1):
         tempL = []
         tempL = [item for item in S if not vecInList(item, chain)] # choose a random point that has not been selected yet
         if tempL == []:
             plt.plot([chain[0][0], chain[-1][0]] , [chain[0][1], chain[-1][1]], 'blue')
-            plt.pause(0.1)
+            plt.pause(delay)
             break
         u = tempL[0]
         outln, = plt.plot([r[0], u[0]] , [r[1], u[1]], 'blue')
-        plt.pause(0.1)
+        plt.pause(delay)
         for t in S: # t in S 
             if np.array_equal(t, u):   #S\{u}
                 continue
             ln, = plt.plot([r[0], t[0]], [r[1], t[1]], color='green')
-            plt.pause(0.1)
+            plt.pause(delay)
             if CCW(r, u, t) > 0 or (CCW(r,u,t) == 0 and dist(r,u) < dist(r,t) and dist(t,u) < dist(t,r)):
                 u = t
                 outln.remove()
@@ -300,14 +300,14 @@ def gift_wrapping_show_steps(S):
             ln.remove()
         if np.array_equal(u, chain[0]):   # u == r0
             plt.plot([chain[0][0], chain[-1][0]] , [chain[0][1], chain[-1][1]], 'blue')
-            plt.pause(0.1)
+            plt.pause(delay)
             break
         else:
             r = u
             # remVec(r, S) # S <- S\{r}
             chain.append(r)
             plt.plot(r[0], r[1],'o', color='blue')
-            plt.pause(0.1)
+            plt.pause(delay)
 
     plt.show()
     print(chain)

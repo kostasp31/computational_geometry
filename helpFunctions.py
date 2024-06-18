@@ -114,3 +114,22 @@ def printHull(L, point_list):
     y = np.array([y2[0], y2[-1]])
     plt.plot(x, y, 'blue')
     plt.show()
+
+def genRandompoints(count, _range, _seed, method='circle'):
+    p_list = []
+    if method=='circle':
+        random.seed(_seed)
+        # radius of the circle
+        circle_r = _range
+        circle_x = 0
+        circle_y = 0
+        for i in range(0,count):   # 10 random real numbers
+            # random angle
+            alpha = 2 * math.pi * random.random()
+            # random radius
+            r = circle_r * math.sqrt(random.random())
+            p_list.append(np.array([r * math.cos(alpha) + circle_x, r * math.sin(alpha) + circle_y]))
+    elif method=='rect':
+        for i in range(0,100):   # 10 random real numbers
+            p_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
+    return p_list
