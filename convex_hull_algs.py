@@ -320,10 +320,39 @@ def gift_wrapping_show_steps(S, delay=0.05, _range=100):
 def choose_initial_edge(S):
     min_x_point = S[0]
     for point in S:
-        if point[0] < min_x_point:
-            min_x_point = point[0]
+        if point[0] < min_x_point[0]:
+            min_x_point = point
+    
+    projected_points = []
+    for point in S:
+        tmp = np.array([point[0], point[1]])
+        projected_points.append(tmp)
 
-    return 0
+
+    chain = []
+    r = min_x_point
+    chain.append(r)
+    tempL = []
+    tempL = [item for item in projected_points if not vecInList(item, chain)] # choose a random point that has not been selected yet
+    u = tempL[0]
+    for t in S: # t in S 
+        if np.array_equal(t, u):   #S\{u}
+            continue
+        if CCW(r, u, t) > 0 or (CCW(r,u,t) == 0 and dist(r,u) < dist(r,t) and dist(t,u) < dist(t,r)):
+            u = t
+    r = u
+    chain.append(r)
+
+    new_point = r
+    for item in S:
+        if item[0] == new_point[0] and item[1] == new_point[1]:
+            new_point = item
+
+    e = edge(min_x_point, new_point)
+    return e
 
 def gift_wrapping_3d(S):
     convex_hull = []
+    e = choose_initial_edge(S)
+    print_edge(e)
+    return e
