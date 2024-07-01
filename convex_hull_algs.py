@@ -55,8 +55,7 @@ def gift_wrapping(S):
             # remVec(r, S) # S <- S\{r}
             chain.append(r)
 
-
-        
+    
 def merge(A, B):
     # print('Merging:', A, B)
     finalHull = []
@@ -263,15 +262,13 @@ def hull_rec(A, B, S):
         N.append(B)
         return hull_rec(A, C, M)[:-1] + hull_rec(C, B, N)
         
-
-
-def gift_wrapping_show_steps(S, delay=0.05):
+def gift_wrapping_show_steps(S, delay=0.05, _range=100):
     chain = []
     r = min(S, key=minKey)    # point with min x, if many, the one with min y
     chain.append(r)
 
     import matplotlib.pyplot as plt
-    plt.axis([-110, 110, -110, 110])
+    plt.axis([-_range-10, _range+10, -_range-10, _range+10])
     for i in S:
         plt.plot(i[0], i[1],'o', color='red')
         plt.pause(delay)
@@ -312,3 +309,21 @@ def gift_wrapping_show_steps(S, delay=0.05):
     plt.show()
     print(chain)
     return chain
+
+
+
+# Choose the first edge of the convex hull (2 points)
+# Find a point with minimum x
+# Find the next vertex by 2D gift wrapping on the 2D projection of the points on a plane. O(n)
+# The third vertex is obtained by comparing the faces built from the above edge and all remaining points. O(n)
+
+def choose_initial_edge(S):
+    min_x_point = S[0]
+    for point in S:
+        if point[0] < min_x_point:
+            min_x_point = point[0]
+
+    return 0
+
+def gift_wrapping_3d(S):
+    convex_hull = []

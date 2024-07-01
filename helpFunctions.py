@@ -123,13 +123,25 @@ def genRandompoints(count, _range, _seed, method='circle'):
         circle_r = _range
         circle_x = 0
         circle_y = 0
-        for i in range(0,count):   # 10 random real numbers
+        for i in range(0,count):
             # random angle
             alpha = 2 * math.pi * random.random()
             # random radius
             r = circle_r * math.sqrt(random.random())
             p_list.append(np.array([r * math.cos(alpha) + circle_x, r * math.sin(alpha) + circle_y]))
     elif method=='rect':
-        for i in range(0,100):   # 10 random real numbers
-            p_list.append(np.array([random.uniform(-100.0, 100.0), random.uniform(-100.0, 100.0)]))
+        for i in range(0,count):
+            p_list.append(np.array([random.uniform(-_range, _range), random.uniform(-_range, _range)]))
     return p_list
+
+
+def print_edge(e):
+    print("{:10.4f}".format(e.p1[0]), '\t', "{:10.4f}".format(e.p2[0]))
+    print("{:10.4f}".format(e.p1[1]), '  -->', "{:10.4f}".format(e.p2[1]))
+    print("{:10.4f}".format(e.p1[2]), '\t', "{:10.4f}".format(e.p2[2]))
+
+class edge:
+    def __init__(self, p1, p2):
+        self.p1 = p1
+        self.p2 = p2
+        self.visited = False
