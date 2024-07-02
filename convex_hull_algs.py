@@ -316,7 +316,6 @@ def gift_wrapping_show_steps(S, delay=0.05, _range=100):
 # Find a point with minimum x
 # Find the next vertex by 2D gift wrapping on the 2D projection of the points on a plane. O(n)
 # The third vertex is obtained by comparing the faces built from the above edge and all remaining points. O(n)
-
 def choose_initial_edge(S):
     min_x_point = S[0]
     for point in S:
@@ -352,42 +351,44 @@ def choose_initial_edge(S):
     return (e,projected_points)
 
 def gift_wrapping_3d(S):
-    convex_hull = []
+    convex_hull = []    # triangles of convex hull
     e,proj = choose_initial_edge(S)
+    visited = []    # visited edges
     # print_edge(e)
     Q = []
     Q.append(e)
-
-    in_hull  = []
+    in_hull  = []   # points of convex hull
     in_hull.append(e.p1)
     in_hull.append(e.p2)
 
     while (len(Q)):
         ed = Q.pop(0)
-        if ed.visited == False:
+        if not edgeInList(ed, visited):
             p3 = getThirdPoint(ed.p1, ed.p2, in_hull, S)
-            print('p3 = ', p3)
+            # print('p3 = ', p3)
             in_hull.append(p3)
             convex_hull.append((ed.p1, ed.p2, p3))
             ed23 = edge(ed.p2, p3)
             ed31 = edge(p3, ed.p1)
+            ed12 = edge(ed.p1, ed.p2)
             Q.append(ed23)
             Q.append(ed31)
-            ed.visited = True
-    return e,proj
+            Q.append(ed12)
+            visited.append(ed)
+
+    print(convex_hull)
+    return e,proj,convex_hull
 
 def getThirdPoint(p1, p2, point_in_hull, S):
-    print(point_in_hull)
+    # print(point_in_hull)
+
+    new_point = S[0]
     for p3 in S.copy():
         found = True
-        if not vecInList(p3, point_in_hull):
-            for p4 in S.copy():
-                if np.array_equal(p3, p4):
-                    continue
-                if CCW_3d(p4, p1, p2, p3) >  0:
-                    found = False
-                    break
-            if found:
-                return p3
-    return None
+        if not vecInList(p3, point_in_hull) and not np.array_equal(p1, p3) and not np.array_equal(p2, p3) and not np.array_equal(new_point, p3):
+            vol = np.linalg.norm(np.dot((p1-new_point), np.cross(p2-new_point, p3-new_point)))/6
+            if vol > 0:
+                new_point = p3
+
+    return new_point
             

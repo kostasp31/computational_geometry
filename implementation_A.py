@@ -33,14 +33,36 @@ def main():
 
     p_list = []
     # random.seed(473549)
-    for i in range(0,10):
-        p_list.append(np.array([random.uniform(-100, 100), random.uniform(-100, 100), random.uniform(-100, 100)]))
+    circle_r = 100
+    circle_x = 0
+    circle_y = 0
+    for i in range(0,4):
+        # random angle
+        alpha = 2 * math.pi * random.random()
+        beta = 2 * math.pi * random.random()
+        # random radius
+        r = circle_r * math.sqrt(random.random())
+        d_2 = np.array([r * math.cos(alpha) + circle_x, r * math.sin(alpha) + circle_y, 0])
+    
 
-    e1,proj = gift_wrapping_3d(p_list.copy())
+        rotation_axis = np.array([1, 1, 0])     # z
+        rotation_vector = beta * rotation_axis
+        rotation = scipy.spatial.transform.Rotation.from_rotvec(rotation_vector)
+        rotated_vector = rotation.apply(d_2)
+
+        # print(rotated_vector)
+        p_list.append(rotated_vector)
+
+
+    # for i in range(0,100):
+    #     p_list.append(np.array([random.uniform(-100, 100), random.uniform(-100, 100), random.uniform(-100, 100)]))
+
+    e1,proj,hull = gift_wrapping_3d(p_list.copy())
 
 
 
     import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
     fig = plt.figure(figsize=(12, 8))
     ax = fig.add_subplot(projection='3d')
     ax.set_xlabel('$X$')
@@ -75,14 +97,22 @@ def main():
 
     # plt.plot(x_vals, y_vals, z_vals, 'red')
     ax.scatter(x_vals, y_vals, z_vals, 'green')
-    ax.scatter(p_x, p_y, p_z, 'blue')
+    # ax.scatter(p_x, p_y, p_z, 'blue')
 
-    x = np.outer(np.linspace(-100, 100, 32), np.ones(32))
-    y = x.copy().T # transpose
-    z = (np.outer(np.linspace(-100, 100, 32), np.zeros(32)))
-    ax.plot_surface(x,y,z, alpha=0.2)
+    #plot the xy plane
+    # x = np.outer(np.linspace(-100, 100, 32), np.ones(32))
+    # y = x.copy().T # transpose
+    # z = (np.outer(np.linspace(-100, 100, 32), np.zeros(32)))
+    # ax.plot_surface(x,y,z, alpha=0.2)
 
-    plt.plot(xe, ye, ze, 'blue')
+    #plot the first edge
+    # plt.plot(xe, ye, ze, 'blue')
+
+    for tri in hull:
+        triangle = graphicalTriangle(tri[0], tri[1], tri[2])
+        ax.add_collection3d(Poly3DCollection(triangle, linewidths=3, alpha=0.7))
+
+
     plt.show()
     
 

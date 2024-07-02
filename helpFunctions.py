@@ -180,3 +180,28 @@ class edge:
         self.p1 = p1
         self.p2 = p2
         self.visited = False
+
+def edgeInList(e, li):
+    for itm in li:
+        if (np.array_equal(e.p1, itm.p1) and np.array_equal(e.p2, itm.p2)) or (np.array_equal(e.p1, itm.p2) and np.array_equal(e.p2, itm.p1)):
+            return True
+    return False
+
+def equalEdges(e1, e2):
+    if (np.array_equal(e1.p1, e2.p1) and np.array_equal(e1.p2, e2.p2)) or (np.array_equal(e1.p1, e2.p2) and np.array_equal(e1.p2, e2.p1)):
+        return True   
+    else:
+        return False
+    
+def graphicalTriangle(p1, p2, p3):
+    x = [p1[0], p2[0], p3[0]]
+    y = [p1[1], p2[1], p3[1]]
+    z = [p1[2], p2[2], p3[2]]
+    poly3d = [list(zip(x,y,z))]
+    return poly3d
+
+def removeDupFromList(li):
+    for item in li:
+        for itm in li.remove(item):
+            if np.array_equal(item, itm):
+                continue
