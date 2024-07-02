@@ -331,11 +331,11 @@ def choose_initial_edge(S):
 
     chain = []
     r = min_x_point
-    chain.append(r)
+    chain.append(np.array([r[0], r[1]]))
     tempL = []
     tempL = [item for item in projected_points if not vecInList(item, chain)] # choose a random point that has not been selected yet
     u = tempL[0]
-    for t in S: # t in S 
+    for t in projected_points: # t in S 
         if np.array_equal(t, u):   #S\{u}
             continue
         if CCW(r, u, t) > 0 or (CCW(r,u,t) == 0 and dist(r,u) < dist(r,t) and dist(t,u) < dist(t,r)):
@@ -349,10 +349,45 @@ def choose_initial_edge(S):
             new_point = item
 
     e = edge(min_x_point, new_point)
-    return e
+    return (e,projected_points)
 
 def gift_wrapping_3d(S):
     convex_hull = []
-    e = choose_initial_edge(S)
-    print_edge(e)
-    return e
+    e,proj = choose_initial_edge(S)
+    # print_edge(e)
+    Q = []
+    Q.append(e)
+
+    in_hull  = []
+    in_hull.append(e.p1)
+    in_hull.append(e.p2)
+
+    while (len(Q)):
+        ed = Q.pop(0)
+        if ed.visited == False:
+            p3 = getThirdPoint(ed.p1, ed.p2, in_hull, S)
+            print('p3 = ', p3)
+            in_hull.append(p3)
+            convex_hull.append((ed.p1, ed.p2, p3))
+            ed23 = edge(ed.p2, p3)
+            ed31 = edge(p3, ed.p1)
+            Q.append(ed23)
+            Q.append(ed31)
+            ed.visited = True
+    return e,proj
+
+def getThirdPoint(p1, p2, point_in_hull, S):
+    print(point_in_hull)
+    for p3 in S.copy():
+        found = True
+        if not vecInList(p3, point_in_hull):
+            for p4 in S.copy():
+                if np.array_equal(p3, p4):
+                    continue
+                if CCW_3d(p4, p1, p2, p3) >  0:
+                    found = False
+                    break
+            if found:
+                return p3
+    return None
+            

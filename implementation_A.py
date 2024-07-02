@@ -1,10 +1,10 @@
 from convex_hull_algs import *
 
 def main():
-    point_range = 100
+    point_range = 10
     total_points = 30
     # print("Computational Geometry")
-    # point_list = genRandompoints(total_points, point_range, 6648841, method='circle')
+    # point_list = genRandompoints(total_points, point_range, 634774, method='circle')
 
     # print("GIFT WRAPPING")
     # LG = gift_wrapping(point_list.copy())
@@ -22,17 +22,23 @@ def main():
     # LD = divide_and_conquer(point_list.copy())
     # print(LD, '\n')
 
-    # # printHull(LG, point_list.copy())
-    # # printHull(LI, point_list.copy())
-    # # printHull(LQ, point_list.copy())
-    # # printHull(LD, point_list.copy())
+    # printHull(LG, point_list.copy())
+    # printHull(LI, point_list.copy())
+    # printHull(LQ, point_list.copy())
+    # printHull(LD, point_list.copy())
 
     # gift_wrapping_show_steps(point_list.copy(), delay=0.001, _range=point_range)
-    print('a')
+
+
+
     p_list = []
-    for i in range(0,8):
+    # random.seed(473549)
+    for i in range(0,10):
         p_list.append(np.array([random.uniform(-100, 100), random.uniform(-100, 100), random.uniform(-100, 100)]))
-    e1 = gift_wrapping_3d(p_list.copy())
+
+    e1,proj = gift_wrapping_3d(p_list.copy())
+
+
 
     import matplotlib.pyplot as plt
     fig = plt.figure(figsize=(12, 8))
@@ -59,8 +65,23 @@ def main():
     ze.append(e1.p1[2])
     ze.append(e1.p2[2])
 
+    p_x = []
+    p_y = []
+    p_z = []
+    for itm in proj:
+        p_x.append(itm[0])
+        p_y.append(itm[1])
+        p_z.append(0.0)
+
     # plt.plot(x_vals, y_vals, z_vals, 'red')
     ax.scatter(x_vals, y_vals, z_vals, 'green')
+    ax.scatter(p_x, p_y, p_z, 'blue')
+
+    x = np.outer(np.linspace(-100, 100, 32), np.ones(32))
+    y = x.copy().T # transpose
+    z = (np.outer(np.linspace(-100, 100, 32), np.zeros(32)))
+    ax.plot_surface(x,y,z, alpha=0.2)
+
     plt.plot(xe, ye, ze, 'blue')
     plt.show()
     

@@ -31,6 +31,37 @@ def CCW(p0, p1, p2):
     else: 
         return 0
 
+
+# 1   x0  y0  z0
+# 1   x1  y1  z1
+# 1   x2  y2  z2
+# 1   x3  y3  z3
+
+def CCW_3d(p0, p1, p2, p3):
+    mat = np.ones((4,4), dtype=float)
+    mat[0][1] = p0[0]
+    mat[0][2] = p0[1]
+    mat[0][3] = p0[2]
+    mat[1][1] = p1[0]
+    mat[1][2] = p1[1]
+    mat[1][3] = p1[2]
+    mat[2][1] = p2[0]
+    mat[2][2] = p2[1]
+    mat[2][3] = p2[2]
+    mat[3][1] = p3[0]
+    mat[3][2] = p3[1]
+    mat[3][3] = p3[2]
+
+    det_ = np.linalg.det(mat)
+    print(mat)
+    print(det_)
+    if (det_ > 0):
+        return 1
+    elif (det_ < 0):
+        return -1
+    else: 
+        return 0
+
 # return the X of a nparray (point)
 def getX(nparray):
     return nparray[0]
@@ -121,7 +152,8 @@ def printHull(L, point_list):
 def genRandompoints(count, _range, _seed, method='circle'):
     p_list = []
     if method=='circle':
-        random.seed(_seed)
+        if _seed:
+            random.seed(_seed)
         # radius of the circle
         circle_r = _range
         circle_x = 0
