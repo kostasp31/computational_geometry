@@ -10,7 +10,6 @@ def delaunay_triangulation(point_list):
         point_list_3d.append(p)
     
     hull_3d = gift_wrapping_3d(point_list_3d)
-
     # get only the down-facing faces of the 3d convex hull
     # this is true if the z coord of the normal vector of the face
     # is positive
@@ -111,8 +110,8 @@ def delaunay_plot_2d(delaunay):
     fig, ax = plt.subplots(1, 1, constrained_layout=True)
     fig.suptitle('Delaunay triangulation', fontsize=14)
     for tri in delaunay:
-        x1.append(itm[0])
-        y1.append(itm[1])
+        # x1.append(itm[0])
+        # y1.append(itm[1])
 
         x2 = []
         y2 = []
