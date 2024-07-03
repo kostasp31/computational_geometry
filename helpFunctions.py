@@ -67,7 +67,7 @@ def getX(nparray):
     return nparray[0]
 
 def getY(nparray):
-    return nparray[0]
+    return nparray[1]
 
 def dist(a, b):
     d = math.sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)
