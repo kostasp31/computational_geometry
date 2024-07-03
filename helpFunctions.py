@@ -123,7 +123,7 @@ def getIndexOfRightmost(H):
 def distFromLine(a, b, c):
     return np.linalg.norm(np.cross(b-a, a-c))/np.linalg.norm(b-a)
 
-def printHull(L, point_list):
+def printHull(L, point_list, title):
     import matplotlib.pyplot as plt 
     x1 = []
     y1 = []
@@ -137,7 +137,11 @@ def printHull(L, point_list):
         x2.append(itm[0])
         y2.append(itm[1])
 
+    fig, ax = plt.subplots(1, 1, constrained_layout=True)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
     plt.plot(x1,y1,'o', color='red')
+    fig.suptitle(title, fontsize=14)
     plt.plot(x2,y2,'o', color='red')
     for i in range(0, len(x2), 2):
         plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
@@ -151,9 +155,9 @@ def printHull(L, point_list):
 
 def genRandompoints(count, _range, _seed, method='circle'):
     p_list = []
+    if _seed:
+        random.seed(_seed)
     if method=='circle':
-        if _seed:
-            random.seed(_seed)
         # radius of the circle
         circle_r = _range
         circle_x = 0
@@ -167,6 +171,33 @@ def genRandompoints(count, _range, _seed, method='circle'):
     elif method=='rect':
         for i in range(0,count):
             p_list.append(np.array([random.uniform(-_range, _range), random.uniform(-_range, _range)]))
+    return p_list
+
+def getRandompoints_3d(count, _range, _seed, method='circle'):
+    p_list = []
+    if _seed:
+        random.seed(_seed)
+
+    if method == 'circle':
+        circle_r = _range
+        circle_x = 0
+        circle_y = 0
+        for i in range(0,count):
+            # random angle
+            alpha = 2 * math.pi * random.random()
+            beta = 2 * math.pi * random.random()
+            # random radius
+            r = circle_r * math.sqrt(random.random())
+            d_2 = np.array([r * math.cos(alpha) + circle_x, r * math.sin(alpha) + circle_y, 0])
+        
+            rotation_axis = np.array([1, 1, 0])     # z
+            rotation_vector = beta * rotation_axis
+            rotation = scipy.spatial.transform.Rotation.from_rotvec(rotation_vector)
+            rotated_vector = rotation.apply(d_2)
+            p_list.append(rotated_vector)
+    elif method=='rect':
+        for i in range(0,count):
+            p_list.append(np.array([random.uniform(-_range, _range), random.uniform(-_range, _range), random.uniform(-_range, _range)]))
     return p_list
 
 
@@ -206,3 +237,46 @@ def removeDupFromList(li):
         for itm in li.remove(item):
             if np.array_equal(item, itm):
                 continue
+
+def hull_3d_print(p_list, hull):
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+    fig = plt.figure(figsize=(12, 8))
+    ax = fig.add_subplot(projection='3d')
+    ax.set_xlabel('$X$')
+    ax.set_ylabel('$Y$')
+    ax.set_zlabel('$Z$')
+
+    x_vals = []
+    y_vals = []
+    z_vals = []
+    for itm in p_list:
+        x_vals.append(itm[0])
+        y_vals.append(itm[1])
+        z_vals.append(itm[2])
+
+    ax.scatter(x_vals, y_vals, z_vals, 'green')
+
+    #plot the xy plane
+    # x = np.outer(np.linspace(-100, 100, 32), np.ones(32))
+    # y = x.copy().T # transpose
+    # z = (np.outer(np.linspace(-100, 100, 32), np.zeros(32)))
+    # ax.plot_surface(x,y,z, alpha=0.2)
+
+    for tri in hull:
+        triangle = graphicalTriangle(tri[0], tri[1], tri[2])
+
+        i = random.randint(0,3)
+        if i==0:
+            c = 'red'
+        elif i==1:
+            c = 'blue'
+        else:
+            c = 'green'
+        t = ax.add_collection3d(Poly3DCollection(triangle, facecolors=c, linewidths=1, alpha=0.5))
+        t.set_edgecolor('k')
+        fig.canvas.draw()  
+        plt.pause(0.1)
+
+    plt.show()
+

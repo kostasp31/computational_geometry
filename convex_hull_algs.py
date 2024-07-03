@@ -269,6 +269,11 @@ def gift_wrapping_show_steps(S, delay=0.05, _range=100):
     chain.append(r)
 
     import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(1, 1, constrained_layout=True)
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    fig.suptitle('Gift Wrapping', fontsize=14)
+
     plt.axis([-_range-10, _range+10, -_range-10, _range+10])
     for i in S:
         plt.plot(i[0], i[1],'o', color='red')
@@ -383,13 +388,11 @@ def gift_wrapping_3d(S):
                 Q.put(ed23_r)
             if not edgeInList(ed31_r, visited):
                 Q.put(ed31_r)
-    return e,proj,convex_hull
+    return convex_hull
 
 def getThirdPoint(p1, p2, S):
     zero_p = np.array([float("-inf"), float("-inf"), float("-inf")])
     new_point = zero_p
-
-    edg = p1 - p2
 
     for p3 in S:
         if (not np.array_equal(p1, p3)) and (not np.array_equal(p2, p3)):
@@ -397,20 +400,8 @@ def getThirdPoint(p1, p2, S):
                 new_point = p3
                 continue
 
-            def project(a, b):
-                """Project point 'a' onto the direction vector 'b'."""
-                length = np.dot(a, b)
-                return np.array([length * b[0], length * b[1], length * b[2]])
-
-            v = p3 - p1
-            # v = v - project(v, edg)
-
-            u = new_point - p1
-            # u = u - project(u, edg)
-
-            cross = np.cross(u, v)
-            vol = np.dot(cross, edg)/6
-            print(vol)
+            cross = np.cross((new_point - p1), (p3 - p1))
+            vol = np.dot(cross, p1 - p2)/6
             if vol > 0:
                 new_point = p3
 
