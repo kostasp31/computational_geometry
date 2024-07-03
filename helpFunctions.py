@@ -232,6 +232,13 @@ def graphicalTriangle(p1, p2, p3):
     poly3d = [list(zip(x,y,z))]
     return poly3d
 
+def graphicalTriangle_2d(p1, p2, p3):
+    x = [p1[0], p2[0], p3[0]]
+    y = [p1[1], p2[1], p3[1]]
+    z = [0, 0, 0]
+    poly3d = [list(zip(x,y,z))]
+    return poly3d
+
 def removeDupFromList(li):
     for item in li:
         for itm in li.remove(item):
@@ -280,3 +287,10 @@ def hull_3d_print(p_list, hull):
 
     plt.show()
 
+
+# def get_lower_hull_3d(hull_2d):
+#     hull_2d_down = []
+#     for tri in hull_2d:
+#         Dir = np.cross((tri[1] - tri[0]),(tri[2] - tri[0]))
+#         if Dir > 0:
+#             hull_2d_down.append(tri)
