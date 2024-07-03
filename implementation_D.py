@@ -48,25 +48,32 @@ def create_KDtree(P, depth):
     else:
         if depth % 2 == 0:
             P.sort(key=getX)
-            # print(P)
+            # print('P', P)
             
-            median = int(np.ceil(len(P)/2))
+            median = int(np.ceil(len(P)/2) - 1)
             L = P[median][0]
             # nod = node('n', L, None)
 
-            P1 = P[:median]
-            P2 = P[median:]
+            # print(P[median])
+
+            P1 = P[:median+1]
+            P2 = P[median+1:]
+
         else:
             P.sort(key=getY)
-            # print(P)
+            # print('P', P)
             
-            median = int(np.ceil(len(P)/2))
+            median = int(np.ceil(len(P)/2) - 1)
             L = P[median][1]
             # nod = node('n', L, None)
 
-            P1 = P[:median]
-            P2 = P[median:]
+            P1 = P[:median+1]
+            P2 = P[median+1:]
         
+
+
+        # print(P1)
+        # print(P2)
         N = node('l', L, None)
 
         N.setL(create_KDtree(P1, depth+1))
@@ -74,17 +81,26 @@ def create_KDtree(P, depth):
         return N
 
 
-
+def search_KDtree(root, _range):
+    if root.type == 'n':
+        print()
 
 def main():
-    point_list = genRandompoints(10, 100, 0, method='rect')
+    # point_list = genRandompoints(10, 100, 0, method='rect')
+    point_list = []
+    point_list.append(np.array([-3, 5]))
+    point_list.append(np.array([2, -4]))
+    point_list.append(np.array([0, 1]))
+    point_list.append(np.array([-5, 3]))
+    point_list.append(np.array([1, -2]))
+    point_list.append(np.array([-4, 0]))
     
     root = create_KDtree(point_list, 0)
     print_KDtree(root, depth=0)
 
-    from sklearn.neighbors import KDTree
-    tree = KDTree(point_list, leaf_size=1)
-    tree.get_tree_stats()
+    # from sklearn.neighbors import KDTree
+    # tree = KDTree(point_list, leaf_size=1)
+    # tree.get_tree_stats()
     
 if __name__ == "__main__":
     main()
