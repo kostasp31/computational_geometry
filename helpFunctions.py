@@ -53,8 +53,8 @@ def CCW_3d(p0, p1, p2, p3):
     mat[3][3] = p3[2]
 
     det_ = np.linalg.det(mat)
-    print(mat)
-    print(det_)
+    # print(mat)
+    # print(det_)
     if (det_ > 0):
         return 1
     elif (det_ < 0):
@@ -174,6 +174,7 @@ def print_edge(e):
     print("{:10.4f}".format(e.p1[0]), '\t', "{:10.4f}".format(e.p2[0]))
     print("{:10.4f}".format(e.p1[1]), '  -->', "{:10.4f}".format(e.p2[1]))
     print("{:10.4f}".format(e.p1[2]), '\t', "{:10.4f}".format(e.p2[2]))
+    print('\n')
 
 class edge:
     def __init__(self, p1, p2):
@@ -183,7 +184,7 @@ class edge:
 
 def edgeInList(e, li):
     for itm in li:
-        if (np.array_equal(e.p1, itm.p1) and np.array_equal(e.p2, itm.p2)) or (np.array_equal(e.p1, itm.p2) and np.array_equal(e.p2, itm.p1)):
+        if (np.array_equal(e.p1, itm.p1) and np.array_equal(e.p2, itm.p2)):
             return True
     return False
 

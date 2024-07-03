@@ -32,11 +32,11 @@ def main():
 
 
     p_list = []
-    # random.seed(473549)
+    # random.seed(43549)
     circle_r = 100
     circle_x = 0
     circle_y = 0
-    for i in range(0,4):
+    for i in range(0,100):
         # random angle
         alpha = 2 * math.pi * random.random()
         beta = 2 * math.pi * random.random()
@@ -52,6 +52,11 @@ def main():
 
         # print(rotated_vector)
         p_list.append(rotated_vector)
+    # p_list.append(np.array([0, -60, 40]))
+    # p_list.append(np.array([0, -20, 10]))
+    # p_list.append(np.array([23, 89, 52]))
+    # p_list.append(np.array([54, -51, -77]))
+    # p_list.append(np.array([-76, -54, -22]))
 
 
     # for i in range(0,100):
@@ -59,7 +64,7 @@ def main():
 
     e1,proj,hull = gift_wrapping_3d(p_list.copy())
 
-
+    print(hull)
 
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
@@ -110,7 +115,7 @@ def main():
 
     for tri in hull:
         triangle = graphicalTriangle(tri[0], tri[1], tri[2])
-        ax.add_collection3d(Poly3DCollection(triangle, linewidths=3, alpha=0.7))
+        ax.add_collection3d(Poly3DCollection(triangle, facecolors=['red', 'blue', 'crimson', 'red', 'blue', 'crimson'], linewidths=3, alpha=0.7))
 
 
     plt.show()

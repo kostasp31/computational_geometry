@@ -4,7 +4,6 @@ import random
 import math
 import numpy.linalg
 from helpFunctions import *
-import queue
 
 # points in general position
 def incremental(points):
@@ -354,66 +353,65 @@ def choose_initial_edge(S):
 def gift_wrapping_3d(S):
     convex_hull = []    # triangles of convex hull
     e,proj = choose_initial_edge(S)
+    print("initial:")
+    print_edge(e)
     visited = []    # visited edges
-    Q = queue.Queue()
+    # print_edge(e)
+    Q = []
+    Q.append(e)
+    in_hull  = []   # points of convex hull
+    in_hull.append(e.p1)
+    in_hull.append(e.p2)
 
-    e_r = edge(e.p2, e.p1)
-    visited.append(e)
-    Q.put(e_r)
-
-    while (not Q.empty()):
-        ed = Q.get()
+    while (len(Q)):
+        ed = Q.pop(0)
         if not edgeInList(ed, visited):
-            p3 = getThirdPoint(ed.p1, ed.p2, S)
-
+            print_edge(ed)
+            p3 = getThirdPoint(ed.p1, ed.p2, in_hull, S)
+            if p3[0] == float('-inf'):
+                break
+            print('p3 = ', p3)
+            in_hull.append(p3)
             convex_hull.append((ed.p1, ed.p2, p3))
             ed23 = edge(ed.p2, p3)
-            ed23_r = edge(p3, ed.p2)
             ed31 = edge(p3, ed.p1)
-            ed31_r = edge(ed.p1, p3)
             ed12 = edge(ed.p1, ed.p2)
-            ed12_r = edge(ed.p2, ed.p1)
-
-            visited.append(ed12)
-            visited.append(ed23)
-            visited.append(ed31)
-            if not edgeInList(ed12_r, visited):
-                Q.put(ed12_r)
-            if not edgeInList(ed23_r, visited):
-                Q.put(ed23_r)
-            if not edgeInList(ed31_r, visited):
-                Q.put(ed31_r)
+            Q.append(ed23)
+            Q.append(ed31)
+            Q.append(ed12)
+            print("adding")
+            print_edge(ed23)
+            print("adding")
+            print_edge(ed31)
+            print("adding")
+            print_edge(ed12)
+            visited.append(ed)
     return e,proj,convex_hull
 
-def getThirdPoint(p1, p2, S):
+def getThirdPoint(p1, p2, point_in_hull, S):
+    # print(point_in_hull)
     zero_p = np.array([float("-inf"), float("-inf"), float("-inf")])
-    new_point = zero_p
+    new_point = np.array([float("-inf"), float("-inf"), float("-inf")])
 
-    edg = p1 - p2
-
-    for p3 in S:
-        if (not np.array_equal(p1, p3)) and (not np.array_equal(p2, p3)):
+    if not len(S)-len(point_in_hull):
+        return zero_p
+    for p3 in S.copy():
+        if not np.array_equal(p1, p3) and not np.array_equal(p2, p3) and not vecInList(p3, point_in_hull):
             if np.array_equal(new_point, zero_p):
                 new_point = p3
                 continue
-
-            def project(a, b):
-                """Project point 'a' onto the direction vector 'b'."""
-                length = np.dot(a, b)
-                return np.array([length * b[0], length * b[1], length * b[2]])
-
-            v = p3 - p1
-            # v = v - project(v, edg)
-
-            u = new_point - p1
-            # u = u - project(u, edg)
-
-            cross = np.cross(u, v)
-            vol = np.dot(cross, edg)/6
-            print(vol)
-            if vol > 0:
+            # vol = np.linalg.norm(np.dot((p1-new_point), np.cross(p2-new_point, p3-new_point)))/6
+            # if vol > 0:
+            #     new_point = p3
+            found = 1
+            for p4 in S.copy():
+                if not np.array_equal(p1, p3) and not np.array_equal(p2, p3) and not vecInList(p3, point_in_hull):
+                    if CCW_3d(p4, p1, p2, p3) < 0:
+                        found = 0
+                        break
+            if found:
                 new_point = p3
-
+                break
 
     return new_point
             
