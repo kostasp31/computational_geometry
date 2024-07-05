@@ -29,7 +29,7 @@ def main():
 
     gift_wrapping_show_steps(point_list.copy(), delay=0.001, _range=point_range)
 
-    p_list_3d = getRandompoints_3d(85, 100, 73663, method='circle')
+    p_list_3d = getRandompoints_3d(85, 100,  73663, method='circle')
     hull_3d = gift_wrapping_3d(p_list_3d.copy())
 
     hull_3d_print(p_list_3d, hull_3d)

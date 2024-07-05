@@ -81,9 +81,7 @@ def delaunay_steps(delaunay, point_list_3d, hull_3d_down):
     for itm in point_list_3d:
         ax.plot([itm[0], itm[0]], [itm[1], itm[1]], [itm[2], 0], 'magenta') 
         fig.canvas.draw()  
-        plt.pause(0.03)
-
-
+        # plt.pause(0.03)
 
 
     for tri in delaunay:
