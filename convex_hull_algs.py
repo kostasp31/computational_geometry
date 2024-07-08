@@ -155,7 +155,8 @@ def merge(A, B):
                 finalHull.append(A[i])
         i = getNext(i, A)
 
-    # print(finalHull)
+    print('merged')
+    print(finalHull)
     return finalHull
 
 def divide_and_conquer(points):
@@ -277,7 +278,6 @@ def gift_wrapping_show_steps(S, delay=0.05, _range=100):
     plt.axis([-_range-10, _range+10, -_range-10, _range+10])
     for i in S:
         plt.plot(i[0], i[1],'o', color='red')
-        plt.pause(delay)
 
     plt.plot(r[0], r[1],'o', color='blue')
     plt.pause(delay)

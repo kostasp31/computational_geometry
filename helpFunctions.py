@@ -125,33 +125,41 @@ def distFromLine(a, b, c):
 
 def printHull(L, point_list, title):
     import matplotlib.pyplot as plt 
-    x1 = []
-    y1 = []
-    for itm in point_list:
-        x1.append(itm[0])
-        y1.append(itm[1])
 
-    x2 = []
-    y2 = []
-    for itm in L:
-        x2.append(itm[0])
-        y2.append(itm[1])
+    fig, ax = plt.subplots(2, 2, constrained_layout=True)
+    fig.set_size_inches(10, 8)
 
-    fig, ax = plt.subplots(1, 1, constrained_layout=True)
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    plt.plot(x1,y1,'o', color='red')
-    fig.suptitle(title, fontsize=14)
-    plt.plot(x2,y2,'o', color='red')
-    for i in range(0, len(x2), 2):
-        plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
-    for i in range(1, len(x2), 2):
-        plt.plot(x2[i:i+2], y2[i:i+2], 'blue')
+    currentGraph=0
+    for fi in ax:
+        for fii in fi:
+            x1 = []
+            y1 = []
+            for itm in point_list:
+                x1.append(itm[0])
+                y1.append(itm[1])
 
-    x = np.array([x2[0], x2[-1]])
-    y = np.array([y2[0], y2[-1]])
-    plt.plot(x, y, 'blue')
+            x2 = []
+            y2 = []
+            for itm in L[currentGraph]:
+                x2.append(itm[0])
+                y2.append(itm[1])
+
+            fii.set_xlabel('x')
+            fii.set_ylabel('y')
+            fii.plot(x1,y1,'o', color='red')
+            fii.set_title(title[currentGraph], fontsize=14)
+            fii.plot(x2,y2,'o', color='red')
+            for i in range(0, len(x2), 2):
+                fii.plot(x2[i:i+2], y2[i:i+2], 'blue')
+            for i in range(1, len(x2), 2):
+                fii.plot(x2[i:i+2], y2[i:i+2], 'blue')
+
+            x = np.array([x2[0], x2[-1]])
+            y = np.array([y2[0], y2[-1]])
+            fii.plot(x, y, 'blue')
+            currentGraph+=1
     plt.show()
+
 
 def genRandompoints(count, _range, _seed, method='circle'):
     p_list = []
@@ -171,6 +179,15 @@ def genRandompoints(count, _range, _seed, method='circle'):
     elif method=='rect':
         for i in range(0,count):
             p_list.append(np.array([random.uniform(-_range, _range), random.uniform(-_range, _range)]))
+    return p_list
+
+def genColinearpoints(count, _range=10, _seed=446753):
+    p_list = []
+    if _seed:
+        random.seed(_seed)
+
+    for i in range(0,count):
+        p_list.append(np.array([random.randint(0,9), random.randint(0,9)]))
     return p_list
 
 def getRandompoints_3d(count, _range, _seed, method='circle'):
