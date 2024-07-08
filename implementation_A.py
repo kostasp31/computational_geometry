@@ -36,17 +36,17 @@ def main():
     printHull(L, point_list.copy(), titles)
 
     # Generate colinear points and try to find the convex hulls
-    point_list_colinear = genColinearpoints(40)
+    point_list_colinear = genColinearpoints(50)
     LG_C = gift_wrapping(point_list_colinear.copy())
     LI_C = incremental(point_list_colinear.copy())
-    LQ_C = quick_hull(point_list_colinear.copy())
     LD_C = divide_and_conquer(point_list_colinear.copy())
+    LQ_C = quick_hull(point_list_colinear.copy())
 
     L_C = []
     L_C.append(LG_C)
     L_C.append(LI_C)
-    L_C.append(LQ_C)
     L_C.append(LD_C)
+    L_C.append(LQ_C)
     for i in range(0, len(titles)):
         titles[i] = titles[i] + ' with colinear points'
 

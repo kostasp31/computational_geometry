@@ -1,8 +1,5 @@
-import scipy
 import numpy as np
-import random
 import math
-import numpy.linalg
 from helpFunctions import *
 import queue
 
@@ -41,113 +38,94 @@ def gift_wrapping(S):
         tempL = []
         tempL = [item for item in S if not vecInList(item, chain)] # choose a random point that has not been selected yet
         if tempL == []:
-            print('EMPTYYYY')
             return chain
         u = tempL[0]
         for t in S: # t in S 
             if np.array_equal(t, u):   #S\{u}
                 continue
+            # for collinear points check if u is inside the edge r,t
             if CCW(r, u, t) > 0 or (CCW(r,u,t) == 0 and dist(r,u) < dist(r,t) and dist(t,u) < dist(t,r)):
                 u = t
         if np.array_equal(u, chain[0]):   # u == r0
             return chain
         else:
             r = u
-            # remVec(r, S) # S <- S\{r}
             chain.append(r)
 
-    
+# merge 2 convex hulls by finding the upper and lower edge
 def merge(A, B):
-    # print('Merging:', A, B)
     finalHull = []
-    # if len(A) == 1 or len(B) == 1:
-        # print('a')
-    
     i = getIndexOfRightmost(A)
     j = 0
     upper = []
     lower = []
     while (1):  # upper tangent
-        changed = False
-        # print(i, getNext(i,A), getDiffPoint(A, A[i], A[getNext(i, A)]))
-        # print(j, getPrev(j,B), getDiffPoint(B, B[j], B[getPrev(j, B)]))
         init_i = i
         init_j = j
-        # if getNext(i, A) != 0:
         while  (CCW(A[i], A[getPrev(i, A)], B[j]) < 0):
             i = getPrev(i, A)
-            changed = True
-        # if getPrev(j, B) != len(B)-1:
         while (CCW(B[j], B[getNext(j, B)], A[i]) > 0):
             j = getNext(j, B)
-            changed = True
         if i == init_i and j == init_j:
             break
-    # print('Upper:', A[i], ',', B[j])
     upper.append(A[i])
     upper.append(B[j])
 
     i = getIndexOfRightmost(A)
     j = 0
     while (1):  # lower tangent
-        changed = False
-        # print(i, getPrev(i,A), getDiffPoint(A, A[i], A[getPrev(i, A)]))
-        # print(j, getNext(j,B), getDiffPoint(B, B[j], B[getNext(j, B)]))
         init_i = i
         init_j = j
-        # if getPrev(i, A) != 0:
         while  (CCW(A[i], A[getNext(i, A)], B[j]) > 0):
             i = getNext(i, A)
-            changed = True
-        # if getNext(j, B) != len(B)-1:
         while (CCW(B[j], B[getPrev(j, B)], A[i]) < 0):
             j = getPrev(j, B)
-            changed = True
         if i == init_i and j == init_j:
             break
-    # print('Lower:', A[i], ',', B[j])
     lower.append(A[i])
     lower.append(B[j])
 
     finalHull = []
     i=0
+    # create final chain of items
+    # add upper items of A
     while (1):
-        if not np.array_equal(A[i], upper[0]):
+        if not np.array_equal(A[i], upper[0]):  # until the left point of upper edge is met
             if not vecInList(A[i], finalHull):
                 finalHull.append(A[i])
         else:
-            if not vecInList(upper[0], finalHull):
+            if not vecInList(upper[0], finalHull):  # found the left point of upper edge, add it 
                 finalHull.append(upper[0])
-            if not vecInList(upper[1], finalHull):
+            if not vecInList(upper[1], finalHull):  # also add the right point
                 finalHull.append(upper[1])
             break
         i = getNext(i, A)
 
     start_from = 0
-    for j in range(0, len(B)):
-        if np.array_equal(B[j], upper[1]):
+    for j in range(0, len(B)):  # get the starting index of B items by 
+        if np.array_equal(B[j], upper[1]):  # finding where the right point of upper edge is
             start_from = j#getNext(j, B)
 
     j = start_from
-    while(1):
-        if not np.array_equal(B[j], lower[1]):
+    while(1):   # continue adding items of B
+        if not np.array_equal(B[j], lower[1]):  # untill the right point of the lower edge is found
             if not vecInList(B[j], finalHull):
                 finalHull.append(B[j])
         else:
-            if not vecInList(lower[1], finalHull):
+            if not vecInList(lower[1], finalHull):  # if found, add it and the left point of the bridge as well
                 finalHull.append(lower[1])
             if not vecInList(lower[0], finalHull):
                 finalHull.append(lower[0])
             break
         j = getNext(j, B)
 
-    cont_from = 0
+    cont_from = 0   # where to continue adding items from A
     for i in range(0, len(A)):
         if np.array_equal(A[i], lower[0]):
             cont_from = i#getNext(i, A)
     
     i = cont_from
-    while(1):
+    while(1):   # add all the remaining points until the left point of the bridge is found
         if np.array_equal(A[i], upper[0]):
             break
         else:
@@ -155,15 +133,13 @@ def merge(A, B):
                 finalHull.append(A[i])
         i = getNext(i, A)
 
-    print('merged')
-    print(finalHull)
     return finalHull
 
 def divide_and_conquer(points):
     if len(points) <= 2:
         return (points)   
     
-    points.sort(key=getX)  # sort points in ascending order
+    points.sort(key=minKey)  # sort points in ascending order
     A = points[:math.ceil(len(points)/2)]
     B = points[(math.ceil(len(points)/2)):]
     CHA = divide_and_conquer(A)
@@ -171,7 +147,7 @@ def divide_and_conquer(points):
     m = merge(CHA, CHB)
     return m
 
-
+# fails if the some of the 4 extreme points of the hull are the same
 def quick_hull(points):
     top = 0
     bottom = 0
@@ -192,14 +168,11 @@ def quick_hull(points):
     hull.append(right)
     hull.append(bottom)
     hull.append(left)
-    if len(set(hull)) != 4:
-        print('We should assume that the 4 extreme points are different')
-        print(top)
-        print(right)
-        print(bottom)
-        print(left)
-        return None
+    if len(set(hull)) != 4: # ensure that the 4 extreme points are not the same
+        print('QuickHull failed --- We should assume that the 4 extreme points are different')
+        return []
     
+    # get the hull from the points outside the 4 sides of the shape these 4 points create
     h = hull_rec(points[top], points[right], points)+hull_rec(points[right], points[bottom], points)+hull_rec(points[bottom], points[left], points)+hull_rec(points[left], points[top], points)
     
     first = h[0]
@@ -230,24 +203,26 @@ def quick_hull(points):
 
     return h
 
+# quickhull algorithm, given 2 points A, B and a set of points S
 def hull_rec(A, B, S):
     hull = []
+    # simplest case
     if len(S) == 2 and ((np.array_equal(A, S[0]) and np.array_equal(B, S[1])) or (np.array_equal(A, S[1]) and np.array_equal(B, S[0]))):
         hull.append(A)
         hull.append(B)
         return hull
-    else:
+    else:   # more then 3 points
         maxDist = float('-inf')
         C = np.array([float('-inf'), float('-inf')])
         noneType = C
-        for p in S:
+        for p in S: # get the point that has the greates distance from AB line
             if np.array_equal(A, p) or np.array_equal(B, p):
                 continue
             d = distFromLine(A, B, p)
             if d > maxDist:
                 maxDist = d
                 C = p
-        if np.array_equal(C, noneType):
+        if np.array_equal(C, noneType): # this should not happen
             hull.append(A)
             hull.append(B)
             return hull            
@@ -255,6 +230,7 @@ def hull_rec(A, B, S):
         N = []
         M.append(A)
         N.append(C)
+        # create he 2 subsets of S and recursively call quickhull
         for p in S:
             if CCW(A, C, p) > 0:
                 M.append(p)
@@ -264,6 +240,7 @@ def hull_rec(A, B, S):
         N.append(B)
         return hull_rec(A, C, M)[:-1] + hull_rec(C, B, N)
         
+# visulisation of the gift wrapping algorithm
 def gift_wrapping_show_steps(S, delay=0.05, _range=100):
     chain = []
     r = min(S, key=minKey)    # point with min x, if many, the one with min y
@@ -276,9 +253,11 @@ def gift_wrapping_show_steps(S, delay=0.05, _range=100):
     fig.suptitle('Gift Wrapping', fontsize=14)
 
     plt.axis([-_range-10, _range+10, -_range-10, _range+10])
+    # plot all points (in red)
     for i in S:
         plt.plot(i[0], i[1],'o', color='red')
 
+    # current point r, becomes blue
     plt.plot(r[0], r[1],'o', color='blue')
     plt.pause(delay)
     while (1):
@@ -289,18 +268,20 @@ def gift_wrapping_show_steps(S, delay=0.05, _range=100):
             plt.pause(delay)
             break
         u = tempL[0]
+        # draw a line between r,u
         outln, = plt.plot([r[0], u[0]] , [r[1], u[1]], 'blue')
         plt.pause(delay)
         for t in S: # t in S 
             if np.array_equal(t, u):   #S\{u}
                 continue
+            # plot a line between r,t
             ln, = plt.plot([r[0], t[0]], [r[1], t[1]], color='green')
             plt.pause(delay)
             if CCW(r, u, t) > 0 or (CCW(r,u,t) == 0 and dist(r,u) < dist(r,t) and dist(t,u) < dist(t,r)):
                 u = t
-                outln.remove()
+                outln.remove()  # remove the line u,t
                 outln, = plt.plot([r[0], t[0]] , [r[1], t[1]], 'blue')
-            ln.remove()
+            ln.remove() # remove the line r,u
         if np.array_equal(u, chain[0]):   # u == r0
             plt.plot([chain[0][0], chain[-1][0]] , [chain[0][1], chain[-1][1]], 'blue')
             plt.pause(delay)
@@ -309,13 +290,12 @@ def gift_wrapping_show_steps(S, delay=0.05, _range=100):
             r = u
             # remVec(r, S) # S <- S\{r}
             chain.append(r)
+            # if r is in the hull, make it permanently blue
             plt.plot(r[0], r[1],'o', color='blue')
             plt.pause(delay)
 
     plt.show()
-    print(chain)
     return chain
-
 
 
 # Choose the first edge of the convex hull (2 points)
@@ -332,7 +312,6 @@ def choose_initial_edge(S):
     for point in S:
         tmp = np.array([point[0], point[1]])
         projected_points.append(tmp)
-
 
     chain = []
     r = min_x_point
@@ -372,6 +351,7 @@ def gift_wrapping_3d(S):
             p3 = getThirdPoint(ed.p1, ed.p2, S)
 
             convex_hull.append((ed.p1, ed.p2, p3))
+            # create all possible edges
             ed23 = edge(ed.p2, p3)
             ed23_r = edge(p3, ed.p2)
             ed31 = edge(p3, ed.p1)
@@ -382,6 +362,7 @@ def gift_wrapping_3d(S):
             visited.append(ed12)
             visited.append(ed23)
             visited.append(ed31)
+            # add them in Q to visit, if not visited
             if not edgeInList(ed12_r, visited):
                 Q.put(ed12_r)
             if not edgeInList(ed23_r, visited):
@@ -390,21 +371,19 @@ def gift_wrapping_3d(S):
                 Q.put(ed31_r)
     return convex_hull
 
+# find a point in S that, the triangle it creates with p1, p2 is the best choice
+# this is done by getting the point with the max signed volume
 def getThirdPoint(p1, p2, S):
     zero_p = np.array([float("-inf"), float("-inf"), float("-inf")])
     new_point = zero_p
-
     for p3 in S:
         if (not np.array_equal(p1, p3)) and (not np.array_equal(p2, p3)):
             if np.array_equal(new_point, zero_p):
                 new_point = p3
                 continue
-
             cross = np.cross((new_point - p1), (p3 - p1))
             vol = np.dot(cross, p1 - p2)/6
             if vol > 0:
                 new_point = p3
-
-
     return new_point
             

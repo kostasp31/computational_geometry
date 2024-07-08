@@ -3,23 +3,24 @@ from helpFunctions import *
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
+# kd tree node item
 class node:
     def __init__(self, type, L, P):
         self.left = None
         self.right = None
         self.type = type
         self.Range = None
-        if self.type == 'l':
+        if self.type == 'l':    # 2 types, one contains the value to seperate
             self.l = L
             self.p = None
-        elif self.type == 'n':
+        elif self.type == 'n':  # or leaf
             self.l = None
-            self.p = P
+            self.p = P  # contains inly a point
     
-    def setR(self, r):
+    def setR(self, r):  # right child
         self.right = r
    
-    def setL(self, l):
+    def setL(self, l):  # left child
         self.left = l
 
     def setRange(self, x1, x2, y1, y2):
@@ -48,15 +49,17 @@ def create_KDtree(P, depth):
         leaf = node('n', None, P[0])
         return leaf
     else:
+        # in even depth, divide points by X coordinate
         if depth % 2 == 0:
             P.sort(key=getX)
 
             median = int(np.ceil(len(P)/2) - 1)
             L = P[median][0]
 
+            # seperate them in 2 subspaces
             P1 = P[:median+1]
             P2 = P[median+1:]
-
+        # in odd depth, divide by Y coordinate
         else:
             P.sort(key=getY)
             
@@ -66,10 +69,9 @@ def create_KDtree(P, depth):
             P1 = P[:median+1]
             P2 = P[median+1:]
         
-        N = node('l', L, None)
-        N.setL(create_KDtree(P1, depth+1))
-        N.setR(create_KDtree(P2, depth+1))
-
+        N = node('l', L, None)  # create new, non leaf node
+        N.setL(create_KDtree(P1, depth+1))  # repeat for children
+        N.setR(create_KDtree(P2, depth+1))  
         return N
 
 def intersect(range1, val, where, dimension):
@@ -96,7 +98,6 @@ accepted_points = []
 def report_subtree(Node):
     if Node.type == 'n':
         accepted_points.append(Node.p)
-        # print(Node.p)
         return
 
     report_subtree(Node.left)
@@ -105,9 +106,8 @@ def report_subtree(Node):
 def search_KDtree(Node, _range, noderange, depth):
     if Node.type == 'n':    # root is a leaf
         if (Node.p[0] >= _range[0][0] and Node.p[0] <= _range[0][1]) and (Node.p[1] >= _range[1][0] and Node.p[1] <= _range[1][1]):
-            # print(Node.p)
             accepted_points.append(Node.p)
-    else:
+    else:   # non leaf node
         if depth%2 == 0:
             noderange_l = intersect(noderange, Node.l, 'left', 'x')
             noderange_r = intersect(noderange, Node.l, 'right', 'x')
@@ -125,6 +125,7 @@ def search_KDtree(Node, _range, noderange, depth):
         else:
             search_KDtree(Node.right, _range, noderange_r, depth+1)
 
+# create a plot of the points that are accepted or rejected using the kd tree
 def print_rect_problem(points, accepted, _range):
     x_vals_discarded = []
     y_vals_discarded = []
@@ -137,7 +138,6 @@ def print_rect_problem(points, accepted, _range):
         else:
             x_vals_discarded.append(itm[0])
             y_vals_discarded.append(itm[1])
-
 
     fig = plt.figure(figsize=(12, 8))
     title = 'Orthogonal Range Search\nRange: x ∈ [%.2f, %.2f]  y ∈ [%.2f %.2f]' % (_range[0][0], _range[0][1], _range[1][0], _range[1][1])
