@@ -74,6 +74,9 @@ def create_KDtree(P, depth):
         N.setR(create_KDtree(P2, depth+1))  
         return N
 
+# return the rectangle region that occurs by splitting in x or y
+# the region 'range1' in the line that 'val' creates 
+# and keep the left (top for y dimension) or right (bottom for y dimension) area
 def intersect(range1, val, where, dimension):
     if where == 'left':
         range2 = (float('-inf'), val)
@@ -95,6 +98,8 @@ def completely_in(region1, region2):
 
 
 accepted_points = []
+# traverse subtree with 'Node' as root, get to the leaves
+# and add points found in these leaves in the accepted point list
 def report_subtree(Node):
     if Node.type == 'n':
         accepted_points.append(Node.p)
@@ -103,11 +108,14 @@ def report_subtree(Node):
     report_subtree(Node.left)
     report_subtree(Node.right)    
 
+# search a kd tree for a point and decide if it lays within a range
 def search_KDtree(Node, _range, noderange, depth):
-    if Node.type == 'n':    # root is a leaf
+    if Node.type == 'n':    # if Node is a leaf
+        # keep the point given that it lays inside the _range
         if (Node.p[0] >= _range[0][0] and Node.p[0] <= _range[0][1]) and (Node.p[1] >= _range[1][0] and Node.p[1] <= _range[1][1]):
             accepted_points.append(Node.p)
     else:   # non leaf node
+        # calculate the ranges of the 2 children nodes
         if depth%2 == 0:
             noderange_l = intersect(noderange, Node.l, 'left', 'x')
             noderange_r = intersect(noderange, Node.l, 'right', 'x')
@@ -115,11 +123,12 @@ def search_KDtree(Node, _range, noderange, depth):
             noderange_l = intersect(noderange, Node.l, 'left', 'y')
             noderange_r = intersect(noderange, Node.l, 'right', 'y')
 
+        # if the region of the left node is completely inside the range, accept all points in subtree
         if completely_in(noderange_l, _range):
             report_subtree(Node.left)
-        else:
+        else:   # else recursively call search
             search_KDtree(Node.left, _range, noderange_l, depth+1)
-
+        # the same for the right child
         if completely_in(noderange_r, _range):
             report_subtree(Node.right)
         else:
@@ -127,9 +136,9 @@ def search_KDtree(Node, _range, noderange, depth):
 
 # create a plot of the points that are accepted or rejected using the kd tree
 def print_rect_problem(points, accepted, _range):
-    x_vals_discarded = []
+    x_vals_discarded = []   # all points not in range
     y_vals_discarded = []
-    x_vals_accepted = []
+    x_vals_accepted = []    # all points in range
     y_vals_accepted = []
     for itm in points:
         if vecInList(itm, accepted):
@@ -144,8 +153,11 @@ def print_rect_problem(points, accepted, _range):
     fig.suptitle(title, fontsize=14)
 
     ax = fig.add_subplot()
+    # draw a rectangle of the acccepted range
     ax.add_patch(Rectangle((_range[0][0], _range[1][0]), _range[0][1] - _range[0][0], _range[1][1] - _range[1][0], facecolor="blue", alpha=0.3))
+    # non accepted points are red
     ax.scatter(x_vals_discarded, y_vals_discarded, color='red')
+    # accepted points are blue
     ax.scatter(x_vals_accepted, y_vals_accepted, color='green')
     ax.set_xlabel('$X$')
     ax.set_ylabel('$Y$')
@@ -153,6 +165,7 @@ def print_rect_problem(points, accepted, _range):
     plt.grid()
     plt.show()
 
+# get a random range for x and y inside the region defined by barrier
 def getRandomRange(barrier=100):
     x = [random.uniform(-barrier, barrier), random.uniform(-barrier, barrier)]
     y = [random.uniform(-barrier, barrier), random.uniform(-barrier, barrier)]
