@@ -134,6 +134,10 @@ def search_KDtree(Node, _range, noderange, depth):
         else:
             search_KDtree(Node.right, _range, noderange_r, depth+1)
 
+def print_accepted():
+    for pt in accepted_points:
+        print('[', pt[0], ', ', pt[1], ']')
+
 # create a plot of the points that are accepted or rejected using the kd tree
 def print_rect_problem(points, accepted, _range):
     x_vals_discarded = []   # all points not in range

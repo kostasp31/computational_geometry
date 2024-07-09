@@ -25,8 +25,8 @@ def main():
     L = []
     L.append(LG)
     L.append(LI)
-    L.append(LQ)
     L.append(LD)
+    L.append(LQ)
     titles = []
     titles.append('Gift Wrapping')
     titles.append('Incremental')
@@ -36,17 +36,26 @@ def main():
     printHull(L, point_list.copy(), titles)
 
     # Generate colinear points and try to find the convex hulls
-    point_list_colinear = genColinearpoints(50)
+    point_list_colinear = genColinearpoints(30, _range=10)
+    print("GIFT WRAPPING - COLLINEAR POINTS")
     LG_C = gift_wrapping(point_list_colinear.copy())
+    print(LG_C)
+    print("INCREMENTAL - COLLINEAR POINTS")
     LI_C = incremental(point_list_colinear.copy())
-    LD_C = divide_and_conquer(point_list_colinear.copy())
+    print(LI_C)
+    print("QUICK HULL - COLLINEAR POINTS")
     LQ_C = quick_hull(point_list_colinear.copy())
+    print(LQ_C)
+    print("DIVIDE AND CONQUER - COLLINEAR POINTS")
+    LD_C = divide_and_conquer(point_list_colinear.copy())
+    print(LD_C)
 
     L_C = []
     L_C.append(LG_C)
     L_C.append(LI_C)
     L_C.append(LD_C)
     L_C.append(LQ_C)
+
     for i in range(0, len(titles)):
         titles[i] = titles[i] + ' with colinear points'
 
@@ -58,6 +67,9 @@ def main():
     # not collinear points in 3d
     p_list_3d = getRandompoints_3d(85, 100,  73663, method='circle')
     hull_3d = gift_wrapping_3d(p_list_3d.copy())
+    print('3D GIFT WRAPPING')
+    for i in hull_3d:
+        print('[', i[0], i[1], i[2], ']')
 
     hull_3d_print(p_list_3d, hull_3d)
     

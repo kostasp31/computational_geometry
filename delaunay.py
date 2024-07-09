@@ -103,11 +103,14 @@ def delaunay_steps(delaunay, point_list_3d, hull_3d_down):
     plt.show()
 
 # plot the triangulation in 2d
-def delaunay_plot_2d(delaunay):
+def delaunay_plot_2d(delaunay, title):
     x1 = []
     y1 = []
-    fig, ax = plt.subplots(1, 1, constrained_layout=True)
-    fig.suptitle('Delaunay triangulation', fontsize=14)
+    fig = plt.figure(figsize=(12, 8))
+    fig.suptitle(title, fontsize=14)
+
+    ax = fig.add_subplot()
+    # fig, ax = plt.subplots(1, 1, constrained_layout=True)
     for tri in delaunay:
         x2 = []
         y2 = []

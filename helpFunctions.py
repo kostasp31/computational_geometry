@@ -210,7 +210,13 @@ def genColinearpoints(count, _range=10, _seed=446753):
     # if _seed:
     #     random.seed(_seed)
     for i in range(0,count):
-        p_list.append(np.array([random.randint(0,9), random.randint(0,9)]))
+        point = np.array([random.randint(0,_range-1), random.randint(0,_range-1)])
+        if not vecInList(point, p_list):
+            p_list.append(point)
+        else:
+            i-=1
+            continue
+    
     return p_list
 
 # like genRandomPoints, but for 2d
@@ -288,7 +294,7 @@ def graphicalTriangle_2d(p1, p2, p3):
 # given a list of points, remove duplicates
 def removeDupFromList(li):
     for item in li:
-        for itm in li.remove(item):
+        for itm in li.copy().remove(item):
             if np.array_equal(item, itm):
                 continue
 
