@@ -62,7 +62,7 @@ def main():
     printHull(L_C, point_list_colinear.copy(), titles)
 
     # gift wrapping visulisation
-    gift_wrapping_show_steps(point_list.copy(), delay=0.001, _range=point_range)
+    gift_wrapping_show_steps(point_list.copy()[:40], delay=0.001, _range=point_range)
 
     # not collinear points in 3d
     p_list_3d = getRandompoints_3d(85, 100,  73663, method='circle')
